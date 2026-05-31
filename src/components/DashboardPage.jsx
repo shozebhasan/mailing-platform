@@ -4,14 +4,15 @@ import { useState, useEffect } from 'react'
 
 //  Responsive hook 
 function useBreakpoint() {
-  const [width, setWidth] = useState(
-    typeof window !== 'undefined' ? window.innerWidth : 1200
-  )
+  const [width, setWidth] = useState(1200) // always start with desktop on server
+
   useEffect(() => {
+    setWidth(window.innerWidth) // then correct on client after hydration
     const handler = () => setWidth(window.innerWidth)
     window.addEventListener('resize', handler)
     return () => window.removeEventListener('resize', handler)
   }, [])
+
   const isMobile = width < 640
   const isTablet = width >= 640 && width < 1024
   return { width, isMobile, isTablet, isDesktop: width >= 1024 }

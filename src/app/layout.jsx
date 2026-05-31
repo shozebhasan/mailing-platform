@@ -9,7 +9,7 @@ const MOBILE_BREAKPOINT = 768
 
 export default function RootLayout({ children }) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
-  const [isMobile, setIsMobile] = useState(false)
+  const [isMobile, setIsMobile] = useState(null)
 
   useEffect(() => {
     const check = () => {
@@ -32,6 +32,18 @@ export default function RootLayout({ children }) {
     }
     return () => { document.body.style.overflow = '' }
   }, [isMobile, sidebarOpen])
+
+  if (isMobile === null) return (
+  <html lang="en">
+    <body style={{ display: 'flex', height: '100vh', overflow: 'hidden', background: 'var(--bg)' }}>
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0, overflow: 'hidden' }}>
+        <main style={{ flex: 1, overflowY: 'auto', padding: '24px' }}>
+          {children}
+        </main>
+      </div>
+    </body>
+  </html>
+)
 
   return (
     <html lang="en">
