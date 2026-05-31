@@ -1,8 +1,23 @@
 'use client'
 
+import { useState, useEffect } from 'react'
 
+//  Responsive hook 
+function useBreakpoint() {
+  const [width, setWidth] = useState(
+    typeof window !== 'undefined' ? window.innerWidth : 1200
+  )
+  useEffect(() => {
+    const handler = () => setWidth(window.innerWidth)
+    window.addEventListener('resize', handler)
+    return () => window.removeEventListener('resize', handler)
+  }, [])
+  const isMobile = width < 640
+  const isTablet = width >= 640 && width < 1024
+  return { width, isMobile, isTablet, isDesktop: width >= 1024 }
+}
 
-//  tiny reusable pieces 
+//  Tiny reusable pieces 
 
 function Card({ children, style }) {
   return (
@@ -131,9 +146,9 @@ const hourlyBars = [
   { label: '6pm',  pct: 8,  active: false },
 ]
 
-function BarChart() {
+function BarChart({ compact }) {
   return (
-    <div style={{ display: 'flex', gap: '6px', alignItems: 'flex-end', height: '130px' }}>
+    <div style={{ display: 'flex', gap: compact ? '4px' : '6px', alignItems: 'flex-end', height: compact ? '100px' : '130px' }}>
       {hourlyBars.map(bar => (
         <div key={bar.label} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '5px', height: '100%', justifyContent: 'flex-end' }}>
           <div style={{
@@ -145,7 +160,7 @@ function BarChart() {
             minHeight: '4px',
             transition: 'height .3s',
           }} />
-          <span style={{ fontSize: '10px', color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>{bar.label}</span>
+          <span style={{ fontSize: compact ? '9px' : '10px', color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>{bar.label}</span>
         </div>
       ))}
     </div>
@@ -154,32 +169,33 @@ function BarChart() {
 
 //  Donut chart (SVG) 
 
-function DonutChart() {
-  // 251.2 = full circumference of r=40 circle
+function DonutChart({ stacked }) {
   const total = 251.2
-  const orangeLen = Math.round(total * 0.67)  
-  const greenLen  = Math.round(total * 0.33)  
+  const orangeLen = Math.round(total * 0.67)
+  const greenLen  = Math.round(total * 0.33)
 
   return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: '16px', flexWrap: 'wrap' }}>
+    <div style={{
+      display: 'flex',
+      flexDirection: stacked ? 'row' : 'row',
+      alignItems: 'center',
+      gap: '16px',
+      flexWrap: 'wrap',
+    }}>
       <div style={{ position: 'relative', width: '110px', height: '110px', flexShrink: 0 }}>
         <svg width="110" height="110" viewBox="0 0 110 110">
-          {/* track */}
           <circle cx="55" cy="55" r="40" fill="none" stroke="var(--border)" strokeWidth="14" />
-          {/* orange segment */}
           <circle cx="55" cy="55" r="40" fill="none" stroke="var(--orange)" strokeWidth="14"
             strokeDasharray={`${orangeLen} ${total - orangeLen}`}
             strokeDashoffset="0"
             strokeLinecap="round"
             transform="rotate(-90 55 55)" />
-          {/* green segment */}
           <circle cx="55" cy="55" r="40" fill="none" stroke="var(--success)" strokeWidth="14"
             strokeDasharray={`${greenLen} ${total - greenLen}`}
             strokeDashoffset={-orangeLen}
             strokeLinecap="round"
             transform="rotate(-90 55 55)" />
         </svg>
-        {/* center label */}
         <div style={{
           position: 'absolute', top: '50%', left: '50%',
           transform: 'translate(-50%, -50%)', textAlign: 'center',
@@ -209,14 +225,14 @@ function DonutChart() {
 
 const campaigns = [
   { name: 'Q3 Product Outreach', recipients: '18,000', date: 'Started today', status: 'live'   },
-  { name: 'July Newsletter',      recipients: '12,400', date: 'Jul 15',status: 'done'   },
-  { name: 'Summer Promo Blast',   recipients: '9,800',  date: 'Jul 8', status: 'paused' },
+  { name: 'July Newsletter',      recipients: '12,400', date: 'Jul 15',        status: 'done'   },
+  { name: 'Summer Promo Blast',   recipients: '9,800',  date: 'Jul 8',         status: 'paused' },
 ]
 
 const statusStyles = {
-  live:   { dot: 'var(--success)',  badge: { bg: 'var(--success-bg)',  color: 'var(--success)'  }, label: 'Live',   pctColor: 'var(--orange)' },
-  done:   { dot: 'var(--text-hint)',badge: { bg: 'var(--bg)',          color: 'var(--text-muted)'}, label: 'Done',  pctColor: 'var(--text-muted)' },
-  paused: { dot: 'var(--warning)', badge: { bg: 'var(--warning-bg)',  color: 'var(--warning)'  }, label: 'Paused', pctColor: 'var(--warning)' },
+  live:   { dot: 'var(--success)',   badge: { bg: 'var(--success-bg)',  color: 'var(--success)'   }, label: 'Live'   },
+  done:   { dot: 'var(--text-hint)', badge: { bg: 'var(--bg)',          color: 'var(--text-muted)' }, label: 'Done'   },
+  paused: { dot: 'var(--warning)',   badge: { bg: 'var(--warning-bg)',  color: 'var(--warning)'   }, label: 'Paused' },
 }
 
 function CampaignRow({ name, recipients, date, status }) {
@@ -234,7 +250,6 @@ function CampaignRow({ name, recipients, date, status }) {
         <div style={{ fontWeight: 500, fontSize: '13.5px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{name}</div>
         <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '1px' }}>{recipients} recipients · {date}</div>
       </div>
-      
       <span style={{
         fontSize: '11px', padding: '3px 10px', borderRadius: '99px', fontWeight: 500, flexShrink: 0,
         background: s.badge.bg, color: s.badge.color,
@@ -246,17 +261,30 @@ function CampaignRow({ name, recipients, date, status }) {
 //  Main export 
 
 export default function DashboardPage() {
+  const { isMobile, isTablet } = useBreakpoint()
+
+  const metricsColumns = isMobile ? 'repeat(2, 1fr)' : isTablet ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)'
+  const chartsColumns  = isMobile || isTablet ? '1fr' : '2fr 1fr'
+
   return (
-    <div>
-      {/* Metric cards */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px', marginBottom: '20px' }}>
+    <div style={{ padding: isMobile ? '12px' : isTablet ? '16px' : undefined }}>
+
+      {/*  Metric cards  */}
+      <div style={{ display: 'grid', gridTemplateColumns: metricsColumns, gap: isMobile ? '10px' : '16px', marginBottom: isMobile ? '14px' : '20px' }}>
         {metrics.map(m => <MetricCard key={m.label} {...m} />)}
       </div>
 
-      {/* Live send progress */}
-      <Card style={{ marginBottom: '16px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px', flexWrap: 'wrap', gap: '8px' }}>
-          <span style={{ fontFamily: 'Syne, sans-serif', fontSize: '14px', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '6px' }}>
+      {/*  Live send progress  */}
+      <Card style={{ marginBottom: isMobile ? '12px' : '16px' }}>
+        <div style={{
+          display: 'flex',
+          flexDirection: isMobile ? 'column' : 'row',
+          alignItems: isMobile ? 'flex-start' : 'center',
+          justifyContent: 'space-between',
+          marginBottom: '12px',
+          gap: '6px',
+        }}>
+          <span style={{ fontFamily: 'Syne, sans-serif', fontSize: '14px', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
             <span style={{
               width: '7px', height: '7px', borderRadius: '50%', background: 'var(--success)',
               display: 'inline-block', animation: 'livePulse 1.5s infinite',
@@ -283,32 +311,41 @@ export default function DashboardPage() {
         </div>
 
         {/* Outcome pills */}
-        <div style={{ display: 'flex', gap: '10px', marginTop: '14px', flexWrap: 'wrap' }}>
+        <div style={{
+          display: 'flex',
+          flexDirection: isMobile ? 'column' : 'row',
+          gap: '10px',
+          marginTop: '14px',
+        }}>
           {[
             { label: 'Interested',      val: '621',    bg: 'var(--success-bg)', color: 'var(--success)' },
             { label: 'Not Interested',  val: '300',    bg: 'var(--danger-bg)',  color: 'var(--danger)'  },
             { label: 'No Response Yet', val: '13,329', bg: 'var(--bg)',         color: 'var(--text-muted)' },
           ].map(pill => (
             <div key={pill.label} style={{
-              flex: 1, minWidth: '120px', padding: '12px 14px',
+              flex: 1,
+              padding: isMobile ? '10px 14px' : '12px 14px',
               borderRadius: 'var(--radius-md)',
               background: pill.bg, color: pill.color,
+              display: isMobile ? 'flex' : 'block',
+              alignItems: 'center',
+              justifyContent: 'space-between',
             }}>
-              <div style={{ fontFamily: 'Syne, sans-serif', fontSize: '22px', fontWeight: 700, lineHeight: 1.2 }}>{pill.val}</div>
-              <div style={{ fontSize: '12px', fontWeight: 500, marginTop: '2px' }}>{pill.label}</div>
+              <div style={{ fontFamily: 'Syne, sans-serif', fontSize: isMobile ? '20px' : '22px', fontWeight: 700, lineHeight: 1.2 }}>{pill.val}</div>
+              <div style={{ fontSize: '12px', fontWeight: 500, marginTop: isMobile ? '0' : '2px' }}>{pill.label}</div>
             </div>
           ))}
         </div>
       </Card>
 
-      {/* Charts row */}
-      <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '16px', marginBottom: '20px' }}>
+      {/*  Charts row  */}
+      <div style={{ display: 'grid', gridTemplateColumns: chartsColumns, gap: isMobile ? '12px' : '16px', marginBottom: isMobile ? '16px' : '20px' }}>
         <Card>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
             <SectionTitle>Emails sent per hour</SectionTitle>
             <span style={{ fontSize: '11.5px', color: 'var(--text-muted)' }}>Today</span>
           </div>
-          <BarChart />
+          <BarChart compact={isMobile} />
         </Card>
 
         <Card>
@@ -319,7 +356,7 @@ export default function DashboardPage() {
         </Card>
       </div>
 
-      {/* Recent campaigns */}
+      {/*  Recent campaigns  */}
       <div>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
           <SectionTitle>Recent Campaigns</SectionTitle>
