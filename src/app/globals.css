@@ -1,10 +1,8 @@
-@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,400&display=swap');
+@import "tailwindcss";
 
-*, *::before, *::after {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
+
+
+
 
 :root {
   --orange: #228af2;
@@ -19,8 +17,11 @@
 
   --bg: #F7F6F4;
   --white: #FFFFFF;
-  --border: #E8E5E0;
-  --border-hover: #D0CCC6;
+
+ --border: #E8E5E0;
+  --border-hover: #D0CCC6; 
+  
+  
 
   --success: #2E9E6B;
   --success-bg: #E8F7F1;
@@ -42,20 +43,15 @@
 
 html, body {
   height: 100%;
-  font-family: 'DM Sans', sans-serif;
   font-size: 14px;
   color: var(--text-main);
   background: var(--bg);
   -webkit-font-smoothing: antialiased;
 }
 
-h1, h2, h3, h4, .syne {
-  font-family: 'Syne', sans-serif;
-}
 
-input, select, textarea, button {
-  font-family: 'DM Sans', sans-serif;
-}
+
+
 
 /* Scrollbar */
 ::-webkit-scrollbar { width: 5px; height: 5px; }

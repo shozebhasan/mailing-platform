@@ -6,8 +6,6 @@ import Link from 'next/link'
 const pageTitles = {
   '/dashboard': 'Dashboard',
   '/campaigns': 'Add New Campaign',
-  '/templates': 'Templates',
-  '/analytics': 'Analytics',
 }
 
 const hamburgerIcon = (
@@ -32,107 +30,35 @@ export default function Topbar({ showMenu = false, onMenuClick }) {
   const title = pageTitles[pathname] ?? 'MailFlow Pro'
 
   return (
-    <div
-      style={{
-        height: 'var(--topbar-h)',
-        background: 'var(--white)',
-        borderBottom: '1px solid var(--border)',
-        display: 'flex',
-        alignItems: 'center',
-        padding: '0 24px',
-        gap: '16px',
-        flexShrink: 0,
-      }}
-    >
-      {/* Mobile Hamburger */}
-      {showMenu && (
-        <button
-          onClick={onMenuClick}
-          aria-label="Open navigation"
-          style={{
-            background: 'transparent',
-            border: 'none',
-            cursor: 'pointer',
-            color: 'var(--text-muted)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            padding: '4px',
-            borderRadius: 'var(--radius-md)',
-          }}
-        >
-          {hamburgerIcon}
-        </button>
-      )}
+    <div className="h-14 bg-white border-b border-gray-200 flex items-center px-4 sm:px-6 gap-4 shrink-0">
+
+      {/* hamburger*/}
+      <button
+        onClick={onMenuClick}
+        aria-label="Open navigation"
+        className="lg:hidden flex items-center justify-center p-1.5 rounded-md text-gray-500 hover:bg-gray-100 transition"
+      >
+        {hamburgerIcon}
+      </button>
 
       {/* Page Title */}
-      <span
-        style={{
-          fontFamily: 'Syne, sans-serif',
-          fontSize: '16px',
-          fontWeight: 600,
-        }}
-      >
+      <span className="font-syne text-base font-semibold text-gray-900">
         {title}
       </span>
 
       {/* Right Side */}
-      <div
-        style={{
-          marginLeft: 'auto',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '12px',
-        }}
-      >
+      <div className="ml-auto flex items-center gap-3">
+
         {/* Live Indicator */}
-        <span
-          style={{
-            fontSize: '12px',
-            color: 'var(--text-muted)',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '5px',
-          }}
-        >
-          <span
-            style={{
-              width: '7px',
-              height: '7px',
-              borderRadius: '50%',
-              background: 'var(--success)',
-              display: 'inline-block',
-              animation: 'livePulse 1.5s infinite',
-            }}
-          />
+        <span className="text-xs text-gray-500 flex items-center gap-1.5">
+          <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
           Live
         </span>
 
         {/* New Campaign Button */}
-        <Link href="/campaigns" style={{ textDecoration: 'none' }}>
-          <button
-            style={{
-              background: 'var(--orange)',
-              color: '#fff',
-              border: 'none',
-              borderRadius: 'var(--radius-md)',
-              padding: '7px 16px',
-              fontSize: '13px',
-              fontWeight: 500,
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '6px',
-              fontFamily: 'DM Sans, sans-serif',
-              transition: 'background .15s',
-            }}
-            onMouseEnter={(e) =>
-              (e.currentTarget.style.background = 'var(--orange-dark)')
-            }
-            onMouseLeave={(e) =>
-              (e.currentTarget.style.background = 'var(--orange)')
-            }
-          >
+        <Link href="/campaigns">
+          <button className="bg-blue-500 hover:bg-blue-600 text-white rounded-md px-4 py-1.5 text-sm font-medium flex items-center gap-1.5 transition">
+            
             <svg
               width="13"
               height="13"
@@ -149,14 +75,8 @@ export default function Topbar({ showMenu = false, onMenuClick }) {
             New Campaign
           </button>
         </Link>
-      </div>
 
-      <style>{`
-        @keyframes livePulse {
-          0%, 100% { opacity: 1; }
-          50% { opacity: 0.35; }
-        }
-      `}</style>
+      </div>
     </div>
   )
 }
